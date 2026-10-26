@@ -1,0 +1,71 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model clubs {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(100)
+  country      String    @db.VarChar(100)
+  desc         String    @db.VarChar(500)
+  founded_year Int
+  players      players[]
+  coaches      coaches[]
+
+  @@map("clubs")
+}
+
+model positions {
+  id      Int       @id @default(autoincrement())
+  name    String    @db.VarChar(50)
+  players players[]
+
+  @@map("positions")
+}
+
+model roles {
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar(100)
+  coaches coaches[]
+
+  @@map("roles")
+}
+
+model players {
+  id           Int       @id @default(autoincrement())
+  club_id      Int
+  name         String    @db.VarChar(100)
+  age          Int
+  nationality  String    @db.VarChar(100)
+  position_id  Int
+  squad_number Int
+  photo_url    String?   @db.VarChar(255)
+  club         clubs     @relation(fields: [club_id], references: [id], onDelete: Cascade)
+  position     positions @relation(fields: [position_id], references: [id], onDelete: Cascade)
+
+  @@index([club_id])
+  @@index([position_id])
+  @@map("players")
+}
+
+model coaches {
+  id          Int     @id @default(autoincrement())
+  club_id     Int
+  name        String  @db.VarChar(100)
+  age         Int
+  nationality String  @db.VarChar(100)
+  role_id     Int
+  photo_url   String? @db.VarChar(255)
+  club        clubs   @relation(fields: [club_id], references: [id], onDelete: Cascade)
+  role        roles   @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@index([club_id])
+  @@index([role_id])
+  @@map("coaches")
+}
